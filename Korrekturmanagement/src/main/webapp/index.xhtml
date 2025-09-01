@@ -1,28 +1,56 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui">
- 
-  <h:head>    
-    <title>Korrekturmgmt</title>
-  </h:head>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    template="/template.xhtml">
 
-  <h:body>  
-    <h1>Korrekturmanagement</h1>
-    <h:form>
-      <p:card>
-        <f:facet name="title">
-          Willkommen
-        </f:facet>
-        <p:panelGrid styleClass="showcase-text-align-center">
-          <p:row>
-            <p:commandButton value="Korrekturmgmt" action="#{}" />
-          </p:row>
-        </p:panelGrid>
-        <p:messages id="messages" autoUpdate="true" />
-      </p:card>
-    </h:form>
-  </h:body>
-</html>
+    <ui:define name="title">Korrekturverwaltung</ui:define>
+
+    <ui:define name="content">
+        <div class="container mt-5 border rounded p-4 bg-white">
+            <div class="row justify-content-center">
+                <div class="col-lg-12">
+
+                    <h1 class="text-center mb-4">Korrekturverwaltung</h1>
+
+                    <!-- Neue Korrektur -->
+                    <h:form id="formNeu">
+                        <p:commandButton value="Neue Korrekturanfrage" action="addReport"
+                            ajax="false" class="btn btn-success w-100 mb-3" />
+                    
+                    <p:commandButton value="Daten Bearbeiten" action="login"
+                    	ajax="false"  class="btn btn-warning w-100 mb-3"/>
+                    </h:form>
+                    
+
+                    <!-- Mobile Cards -->
+                    <h:form id="korrekturForm">
+                        <ui:repeat value="#{korrekturTabelleBean.alleKorrekturen}" var="k">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <p><strong>ID:</strong> #{k.id}</p>
+                                    <p><strong>Erstellt am:</strong> #{k.erstelltAmFormatted}</p>
+                                    <p><strong>Bearbeitet am:</strong> #{k.bearbeitetAmFormatted}</p>
+                                    <p><strong>Status:</strong> #{k.bearbeitungsStatus}</p>
+                                    <p><strong>Text:</strong> #{k.errorText}</p>
+                                    <p><strong>Kategorie:</strong> #{k.kategorie}</p>
+                                    <p><strong>Medienbezug:</strong> #{k.medienbezug}</p>
+                                    <p><strong>Priorisierung:</strong> #{k.priorisierung}</p>
+                                    <ui:fragment rendered="#{not empty k.pdfDokument}">
+                                        <p><strong>Datei:</strong> #{k.dateiName}</p>
+                                        <p:commandButton icon="pi pi-download"
+                                            title="Datei herunterladen"
+                                            action="#{korrekturBean.downloadDatei(k.id)}"
+                                            ajax="false"
+                                            class="btn btn-secondary btn-sm" />
+                                    </ui:fragment>
+                                </div>
+                            </div>
+                        </ui:repeat>
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
