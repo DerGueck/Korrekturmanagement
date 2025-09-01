@@ -1,0 +1,105 @@
+<!-- src/main/webapp/addReport.xhtml -->
+<ui:composition template="/template.xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="title">Neue Korrekturanfrage hinzufügen</ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="formNeu" enctype="multipart/form-data">
+            <h3 class="mb-3 text-center">Neue Korrekturanfrage hinzufügen</h3>
+
+            <!-- Beschreibung -->
+            <div class="mb-3">
+                <p:outputLabel for="text" class="form-label">Beschreibung:</p:outputLabel>
+                <p:inputTextarea id="text"
+                                 value="#{korrekturBean.neueKorrektur.errorText}"
+                                 rows="5" cols="30"
+                                 counter="display"
+                                 maxlength="250"
+                                 counterTemplate="{0} Zeichen verbleiben."
+                                 autoResize="false"
+                                 styleClass="form-control"
+                                 required="true"
+                                 requiredMessage="Bitte Text eingeben." />
+                <h:outputText id="display" class="block" />
+            </div>
+
+            <!-- Name -->
+            <div class="mb-3">
+                <p:outputLabel for="person" class="form-label">Name:</p:outputLabel>
+                <p:inputText id="person"
+                             value="#{korrekturBean.neueKorrektur.person}"
+                             styleClass="form-control"
+                             required="true"
+                             maxlength="25"
+                             requiredMessage="Bitte Name eingeben." />
+            </div>
+
+            <!-- Priorisierung -->
+            <div class="mb-3">
+                <p:outputLabel for="priorisierung" value="Priorisierung auswählen :"/>
+                <p:selectOneMenu id="priorisierung"
+                                 value="#{korrekturBean.neueKorrektur.priorisierung}"
+                                 styleClass="form-control"
+                                 required="true"
+                                 hideNoSelectionOption="#{not dropdownBean.hideNoSelectOption}">
+                    <f:selectItem itemLabel="Priorisierung auswählen" itemValue="#{null}" noSelectionOption="true"/>
+                    <f:selectItems value="#{dropdownBean.priorisierungen}" var="prio" itemLabel="#{prio}" itemValue="#{prio}" />
+                </p:selectOneMenu>
+            </div>
+
+            <!-- Kategorie -->
+            <div class="mb-3">
+                <p:outputLabel for="kategorie" value="Kategorie auswählen:"/>
+                <p:selectOneMenu id="kategorie"
+                                 value="#{korrekturBean.neueKorrektur.kategorie}"
+                                 styleClass="form-control"
+                                 required="true"
+                                 hideNoSelectionOption="#{not dropdownBean.hideNoSelectOption}">
+                    <f:selectItem itemLabel="Kategorie auswählen" itemValue="#{null}" noSelectionOption="true"/>
+                    <f:selectItems value="#{dropdownBean.kategorie}" var="kate" itemLabel="#{kate}" itemValue="#{kate}" />
+                </p:selectOneMenu>
+            </div>
+            
+            <!--  Medienbezug -->
+            <div class="mb-3">
+                <p:outputLabel for="medienbezug" class="form-label">(Optional) um was Für ein Medium geht es?:</p:outputLabel>
+                <p:inputText id="medienbezug"
+                             value="#{korrekturBean.neueKorrektur.medienbezug}"
+                             styleClass="form-control"
+                             maxlength="25"
+                             required="false" />
+            </div>
+
+            <!-- Datei Upload -->
+            <div class="mb-3">
+                <p:outputLabel for="pdfUpload" class="form-label">Dokument hochladen:</p:outputLabel>
+                <p:fileUpload id="pdfUpload"
+                              value="#{korrekturBean.datei}"
+                              mode="simple"
+                              allowTypes="/(\.|\/)(pdf|jpe?g)$/"
+                              label="Datei auswählen"
+                              sizeLimit="10485760"
+                              styleClass="form-control"
+                              invalidFileMessage="Nur PDF und JPEG-Dateien erlaubt."
+                              required="false" />
+            </div>
+
+            <!-- Buttons -->
+            <p:commandButton value="Speichern"
+                             action="#{korrekturBean.speichern}"
+                             styleClass="btn btn-success w-100 mb-3" />
+            <p:commandButton value="Abbrechen"
+                             action="index" ajax="false"
+                             immediate="true"
+                             styleClass="btn btn-secondary w-100" />
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

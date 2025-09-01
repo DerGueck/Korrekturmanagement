@@ -1,0 +1,113 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets" template="/template.xhtml">
+
+    <ui:define name="title">Korrekturverwaltung</ui:define>
+
+    <ui:define name="content">
+        <div class="container mt-5 border rounded p-4 bg-white">
+            <div class="row justify-content-center">
+                <div class="col-lg-12">
+
+                    <h1 class="text-center mb-4">Korrekturverwaltung</h1>
+
+                    <!-- Neue Korrektur -->
+                    <h:form id="formNeu">
+                        <p:commandButton value="Neue Korrektur" action="addReport"
+                            ajax="false" class="btn btn-success w-100 mb-3" />
+                    </h:form>
+
+                    <!-- Desktop: DataTable -->
+                    <h:form id="korrekturFormDesktop" class="mt-5 d-none d-lg-block">
+                        <h3 class="mb-3">Vorhandene Korrekturen</h3>
+
+                        <p:dataTable id="tabelle"
+                            value="#{korrekturTabelleBean.alleKorrekturen}" var="k"
+                            paginator="true" rows="10" sortMode="multiple"
+                            class="table table-striped table-bordered"
+                            paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                            rowsPerPageTemplate="5,10,15,20">
+
+                            <p:column headerText="ID" sortBy="#{k.id}">
+                                <h:outputText value="#{k.id}" />
+                            </p:column>
+
+                            <p:column headerText="Erstellt am" sortBy="#{k.erstelltAm}">
+                                <h:outputText value="#{k.erstelltAmFormatted}" />
+                            </p:column>
+
+                            <p:column headerText="Bearbeitet am" sortBy="#{k.bearbeitetAm}">
+                                <h:outputText value="#{k.bearbeitetAmFormatted}" />
+                            </p:column>
+
+                            <p:column headerText="Bearbeitungsstatus"
+                                sortBy="#{korrekturTabelleBean.getBearbeitungsStatusForSort(k)}">
+                                <h:outputText value="#{k.bearbeitungsStatus}" />
+                            </p:column>
+
+                            <p:column headerText="Text"
+                                sortBy="#{korrekturTabelleBean.getErrorTextForSort(k)}"
+                                style="white-space: normal; word-wrap: break-word; width: 20%;">
+                                <h:outputText value="#{k.errorText}" />                                
+                            </p:column>
+
+                            <p:column headerText="Kategorie"
+                                sortBy="#{korrekturTabelleBean.getKategorieForSort(k)}">
+                                <h:outputText value="#{k.kategorie}" />
+                            </p:column>
+
+                            <p:column headerText="Medienbezug"
+                                sortBy="#{korrekturTabelleBean.getMedienbezugForSort(k)}">
+                                <h:outputText value="#{k.medienbezug}" />
+                            </p:column>
+
+                            <p:column headerText="Priorisierung"
+                                sortBy="#{korrekturTabelleBean.getPriorisierungForSort(k)}">
+                                <h:outputText value="#{k.priorisierung}" />
+                            </p:column>
+
+                            <p:column headerText="Datei">
+                                <h:panelGroup rendered="#{not empty k.pdfDokument}">
+                                    <h:outputText value="#{k.dateiName}" class="me-2" />
+                                    <p:commandButton icon="pi pi-download"
+                                        title="Datei herunterladen"
+                                        action="#{korrekturBean.downloadDatei(k.id)}" ajax="false"
+                                        class="btn btn-secondary btn-sm" />
+                                </h:panelGroup>
+                            </p:column>
+
+                        </p:dataTable>
+                    </h:form>
+
+                    <!-- Mobile: Cards -->
+                    <h:form id="korrekturFormMobile" class="mt-5 d-lg-none">
+                        <h3 class="mb-3">Vorhandene Korrekturen</h3>
+
+                        <ui:repeat value="#{korrekturTabelleBean.alleKorrekturen}" var="k">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">ID: #{k.id}</h5>
+                                    <p class="card-text"><strong>Erstellt am:</strong> #{k.erstelltAmFormatted}</p>
+                                    <p class="card-text"><strong>Bearbeitet am:</strong> #{k.bearbeitetAmFormatted}</p>
+                                    <p class="card-text"><strong>Status:</strong> #{k.bearbeitungsStatus}</p>
+                                    <p class="card-text"><strong>Text:</strong> #{k.errorText}</p>
+                                    <p class="card-text"><strong>Kategorie:</strong> #{k.kategorie}</p>
+                                    <p class="card-text"><strong>Medienbezug:</strong> #{k.medienbezug}</p>
+                                    <p class="card-text"><strong>Priorisierung:</strong> #{k.priorisierung}</p>
+                                    <h:panelGroup rendered="#{not empty k.pdfDokument}">
+                                        <p:commandButton icon="pi pi-download"
+                                            title="Datei herunterladen"
+                                            action="#{korrekturBean.downloadDatei(k.id)}" ajax="false"
+                                            class="btn btn-secondary btn-sm" />
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </ui:repeat>
+                    </h:form>
+
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
