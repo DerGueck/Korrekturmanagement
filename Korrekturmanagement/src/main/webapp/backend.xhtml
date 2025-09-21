@@ -1,178 +1,139 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:p="http://primefaces.org/ui"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:f="http://xmlns.jcp.org/jsf/core" template="/template.xhtml">
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/template.xhtml">
 
-	<ui:define name="title">Backend</ui:define>
-	<ui:define name="content">
-		<h:panelGroup rendered="#{loginBean.loggedIn}">
-			<h1>Backend Dashboard</h1>
+    <ui:define name="title">Backend</ui:define>
+    <ui:define name="content">
+        <h:panelGroup rendered="#{loginBean.loggedIn}">
+            <h1>Backend Dashboard</h1>
 
-			<div class="container mt-5 border rounded p-4 bg-white">
-				<ui:insert name="content" />
-				<h:form>
-					<p:commandButton value="Logout" action="#{loginBean.logout}"
-						ajax="false" />
-				</h:form>
-				<!-- - Für Große Monitore Tabelle mit sortier funktion -->
-				<h:form id="korrekturFormDesktop" class="mt-5 d-none d-lg-block">
-					<h3 class="mb-3">Vorhandene Korrekturen</h3>
+            <div class="container mt-5 border rounded p-4 bg-white">
+                <h:form>
+                    <p:commandButton value="Logout" action="#{loginBean.logout}" ajax="false" />
+                </h:form>
 
-					<p:dataTable id="tabelle"
-						value="#{korrekturTabelleBean.alleKorrekturen}" var="k"
-						paginator="true" rows="10" sortMode="multiple"
-						class="table table-striped table-bordered"
-						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-						rowsPerPageTemplate="5,10,15,20">
+                <!-- Desktop Tabelle -->
+                <h:form id="korrekturFormDesktop" class="mt-5 d-none d-lg-block">
+                    <h3 class="mb-3">Vorhandene Korrekturen</h3>
+                    <p:dataTable id="tabelle"
+                                 value="#{korrekturTabelleBean.alleKorrekturen}" var="k"
+                                 paginator="true" rows="10" sortMode="multiple"
+                                 class="table table-striped table-bordered"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15,20">
 
-						<p:column headerText="ID" sortBy="#{k.id}">
-							<h:outputText value="#{k.id}" style="width:5%" />
-						</p:column>
+                        <p:column headerText="ID" sortBy="#{k.id}">
+                            <h:outputText value="#{k.id}" style="width:5%" />
+                        </p:column>
 
-						<p:column headerText="Erstellt am" sortBy="#{k.erstelltAm}">
-							<h:outputText value="#{k.erstelltAmFormatted}" />
-						</p:column>
+                        <p:column headerText="Erstellt am" sortBy="#{k.erstelltAm}">
+                            <h:outputText value="#{k.erstelltAmFormatted}" />
+                        </p:column>
 
-						<p:column headerText="Erstellt von" sortBy="#{k.person}"
-							style="white-space: normal; word-wrap: break-word;">
-							<h:outputText value="#{k.person}" />
-						</p:column>
+                        <p:column headerText="Erstellt von" sortBy="#{k.person}">
+                            <h:outputText value="#{k.person}" />
+                        </p:column>
 
-						<p:column headerText="Bearbeitet am" sortBy="#{k.bearbeitetAm}">
-							<h:outputText value="#{k.bearbeitetAmFormatted}" />
-						</p:column>
+                        <p:column headerText="Bearbeitet am" sortBy="#{k.bearbeitetAm}">
+                            <h:outputText value="#{k.bearbeitetAmFormatted}" />
+                        </p:column>
 
-						<p:column headerText="Bearbeitungsstatus"
-							sortBy="#{korrekturTabelleBean.getBearbeitungsStatusForSort(k)}"
-							style="width:8%">
-							<p:selectOneMenu value="#{k.bearbeitungsStatus}"
-								style="width: 100px">
-								<f:selectItem itemLabel="Neu" itemValue="Neu" />
-								<f:selectItem itemLabel="In Bearbeitung"
-									itemValue="In Bearbeitung" />
-								<f:selectItem itemLabel="Erledigt" itemValue="Erledigt" />
-								<f:selectItem itemLabel="Zurückgestellt"
-									itemValue="Zurückgestellt" />
-								<p:ajax event="change"
-									listener="#{korrekturTabelleBean.updateStatus(k)}"
-									update="tabelle" />
-							</p:selectOneMenu>
-						</p:column>
+                        <p:column headerText="Bearbeitungsstatus" sortBy="#{k.bearbeitungsStatus}" style="width:8%">
+                            <p:selectOneMenu value="#{k.bearbeitungsStatus}" style="width: 100px">
+                                <f:selectItems value="#{statusBean.statusListe}" var="status"
+                                               itemLabel="#{status}" itemValue="#{status}" />
+                                <p:ajax event="change"
+                                        listener="#{korrekturTabelleBean.updateStatus(k)}"
+                                        update="tabelle" />
+                            </p:selectOneMenu>
+                        </p:column>
 
+                        <p:column headerText="Text" sortBy="#{k.errorText}" style="white-space: normal; word-wrap: break-word; width: 20%;">
+                            <h:outputText value="#{k.errorText}" />
+                        </p:column>
 
-						<p:column headerText="Text"
-							sortBy="#{korrekturTabelleBean.getErrorTextForSort(k)}"
-							style="white-space: normal; word-wrap: break-word; width: 20%;">
-							<h:outputText value="#{k.errorText}" />
-						</p:column>
+                        <p:column headerText="Kategorie" sortBy="#{k.kategorie}">
+                            <h:outputText value="#{k.kategorie}" />
+                        </p:column>
 
-						<p:column headerText="Kategorie"
-							sortBy="#{korrekturTabelleBean.getKategorieForSort(k)}">
-							<h:outputText value="#{k.kategorie}" />
-						</p:column>
+                        <p:column headerText="Medienbezug" sortBy="#{k.medienbezug}">
+                            <h:outputText value="#{k.medienbezug}" />
+                        </p:column>
 
-						<p:column headerText="Medienbezug"
-							sortBy="#{korrekturTabelleBean.getMedienbezugForSort(k)}">
-							<h:outputText value="#{k.medienbezug}" />
-						</p:column>
+                        <p:column headerText="Priorisierung" sortBy="#{k.priorisierung}">
+                            <h:outputText value="#{k.priorisierung}" />
+                        </p:column>
 
-						<p:column headerText="Priorisierung"
-							sortBy="#{korrekturTabelleBean.getPriorisierungForSort(k)}">
-							<h:outputText value="#{k.priorisierung}" />
-						</p:column>
+                        <p:column headerText="Datei">
+                            <h:panelGroup rendered="#{not empty k.pdfDokument}">
+                                <h:outputText value="#{k.dateiName}" class="me-2" />
+                                <p:commandButton icon="pi pi-download"
+                                                 title="Datei herunterladen"
+                                                 action="#{korrekturBean.downloadDatei(k.id)}" ajax="false"
+                                                 class="btn btn-secondary btn-sm" />
+                            </h:panelGroup>
+                        </p:column>
 
-						<p:column headerText="Datei">
-							<h:panelGroup rendered="#{not empty k.pdfDokument}">
-								<h:outputText value="#{k.dateiName}" class="me-2" />
-								<p:commandButton icon="pi pi-download"
-									title="Datei herunterladen"
-									action="#{korrekturBean.downloadDatei(k.id)}" ajax="false"
-									class="btn btn-secondary btn-sm" />
-							</h:panelGroup>
-						</p:column>
+                        <p:column headerText="Aktionen" style="text-align:center;">
+                            <p:commandButton icon="pi pi-trash" title="Löschen"
+                                             action="#{korrekturTabelleBean.deleteKorrektur(k)}"
+                                             update="tabelle" styleClass="ui-button-danger"
+                                             onclick="return confirm('Willst du diesen Eintrag wirklich löschen?');" />
+                        </p:column>
 
-						<p:column headerText="Aktionen" style="text-align:center;">
-							<p:commandButton icon="pi pi-trash" title="Löschen"
-								action="#{korrekturTabelleBean.deleteKorrektur(k)}"
-								update="tabelle" styleClass="ui-button-danger"
-								onclick="return confirm('Willst du diesen Eintrag wirklich löschen?');" />
-						</p:column>
+                    </p:dataTable>
+                </h:form>
 
-					</p:dataTable>
-				</h:form>
-			</div>
-			<!-- - Für Kleine Monitore Karten Ansicht -->
-			<!-- Mobile Cards -->
-			<h:form id="korrekturFormMobile" class="mt-5 d-block d-lg-none">
-				<ui:repeat value="#{korrekturTabelleBean.alleKorrekturen}" var="k">
-					<div class="card mb-3">
-						<div class="card-body">
-							<p>
-								<strong>ID:</strong> #{k.id}
-							</p>
-							<p>
-								<strong>Erstellt am:</strong> #{k.erstelltAmFormatted}
-							</p>
-							<p>
-								<strong>Erstellt von:</strong> #{k.person}
-							</p>
-							<p>
-								<strong>Bearbeitet am:</strong> #{k.bearbeitetAmFormatted}
-							</p>
+                <!-- Mobile Ansicht -->
+                <h:form id="korrekturFormMobile" class="mt-5 d-block d-lg-none">
+                    <ui:repeat value="#{korrekturTabelleBean.alleKorrekturen}" var="k">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <p><strong>ID:</strong> #{k.id}</p>
+                                <p><strong>Erstellt am:</strong> #{k.erstelltAmFormatted}</p>
+                                <p><strong>Erstellt von:</strong> #{k.person}</p>
+                                <p><strong>Bearbeitet am:</strong> #{k.bearbeitetAmFormatted}</p>
 
-							<p>
-								<strong>Status:</strong>
-								<p:selectOneMenu value="#{k.bearbeitungsStatus}"
-									style="width: 140px">
-									<f:selectItem itemLabel="Neu" itemValue="Neu" />
-									<f:selectItem itemLabel="In Bearbeitung"
-										itemValue="In Bearbeitung" />
-									<f:selectItem itemLabel="Erledigt" itemValue="Erledigt" />
-									<f:selectItem itemLabel="Zurückgestellt"
-										itemValue="Zurückgestellt" />
-									<p:ajax event="change"
-										listener="#{korrekturTabelleBean.updateStatus(k)}"
-										update="@form" />
-								</p:selectOneMenu>
-							</p>
+                                <p><strong>Status:</strong>
+                                    <p:selectOneMenu value="#{k.bearbeitungsStatus}" style="width: 140px">
+                                        <f:selectItems value="#{statusBean.statusListe}" var="status"
+                                                       itemLabel="#{status}" itemValue="#{status}" />
+                                        <p:ajax event="change"
+                                                listener="#{korrekturTabelleBean.updateStatus(k)}"
+                                                update="@form" />
+                                    </p:selectOneMenu>
+                                </p>
 
-							<p>
-								<strong>Text:</strong> #{k.errorText}
-							</p>
-							<p>
-								<strong>Kategorie:</strong> #{k.kategorie}
-							</p>
-							<p>
-								<strong>Medienbezug:</strong> #{k.medienbezug}
-							</p>
-							<p>
-								<strong>Priorisierung:</strong> #{k.priorisierung}
-							</p>
+                                <p><strong>Text:</strong> #{k.errorText}</p>
+                                <p><strong>Kategorie:</strong> #{k.kategorie}</p>
+                                <p><strong>Medienbezug:</strong> #{k.medienbezug}</p>
+                                <p><strong>Priorisierung:</strong> #{k.priorisierung}</p>
 
-							<ui:fragment rendered="#{not empty k.pdfDokument}">
-								<p>
-									<strong>Datei:</strong> #{k.dateiName}
-								</p>
-								<p:commandButton icon="pi pi-download"
-									title="Datei herunterladen"
-									action="#{korrekturBean.downloadDatei(k.id)}" ajax="false"
-									class="btn btn-secondary btn-sm" />
-							</ui:fragment>
+                                <ui:fragment rendered="#{not empty k.pdfDokument}">
+                                    <p><strong>Datei:</strong> #{k.dateiName}</p>
+                                    <p:commandButton icon="pi pi-download"
+                                                     title="Datei herunterladen"
+                                                     action="#{korrekturBean.downloadDatei(k.id)}" ajax="false"
+                                                     class="btn btn-secondary btn-sm" />
+                                </ui:fragment>
 
-							<p:commandButton icon="pi pi-trash" title="Löschen"
-								action="#{korrekturTabelleBean.deleteKorrektur(k)}"
-								update="@form" styleClass="btn btn-danger btn-sm mt-2"
-								onclick="return confirm('Willst du diesen Eintrag wirklich löschen?');" />
-						</div>
-					</div>
-				</ui:repeat>
-			</h:form>
+                                <p:commandButton icon="pi pi-trash" title="Löschen"
+                                                 action="#{korrekturTabelleBean.deleteKorrektur(k)}"
+                                                 update="@form" styleClass="btn btn-danger btn-sm mt-2"
+                                                 onclick="return confirm('Willst du diesen Eintrag wirklich löschen?');" />
+                            </div>
+                        </div>
+                    </ui:repeat>
+                </h:form>
+            </div>
+        </h:panelGroup>
 
-		</h:panelGroup>
-		<h:panelGroup rendered="#{!loginBean.loggedIn}">
-			<h:outputText value="Zugriff verweigert. Bitte anmelden." />
-			<h:link outcome="login.xhtml" value="Zur Login-Seite" />
-		</h:panelGroup>
-	</ui:define>
+        <h:panelGroup rendered="#{!loginBean.loggedIn}">
+            <h:outputText value="Zugriff verweigert. Bitte anmelden." />
+            <h:link outcome="login.xhtml" value="Zur Login-Seite" />
+        </h:panelGroup>
+    </ui:define>
 </ui:composition>

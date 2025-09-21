@@ -2,8 +2,11 @@ package korrekturmanagement;
 
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
-import jakarta.persistence.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import korrekturmanagement.model.SqlDataKorrekturmgm;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -13,55 +16,39 @@ public class KorrekturTabelleBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("KorrekturMgrPU");
+    @PersistenceContext(unitName = "KorrekturMgrPU")
+    private EntityManager em;
 
     private List<SqlDataKorrekturmgm> alleKorrekturen;
 
     // --- Getter für die Tabelle ---
     public List<SqlDataKorrekturmgm> getAlleKorrekturen() {
         if (alleKorrekturen == null) {
-            EntityManager em = emf.createEntityManager();
-            try {
-                alleKorrekturen = em.createQuery("SELECT k FROM SqlDataKorrekturmgm k", SqlDataKorrekturmgm.class)
-                        .getResultList();
-            } finally {
-                em.close();
-            }
+            alleKorrekturen = em.createQuery("SELECT k FROM SqlDataKorrekturmgm k", SqlDataKorrekturmgm.class)
+                                .getResultList();
         }
         return alleKorrekturen;
     }
 
     // --- Update Status ---
+    @Transactional
     public void updateStatus(SqlDataKorrekturmgm korrektur) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
-            SqlDataKorrekturmgm managed = em.find(SqlDataKorrekturmgm.class, korrektur.getId());
+        SqlDataKorrekturmgm managed = em.find(SqlDataKorrekturmgm.class, korrektur.getId());
+        if (managed != null) {
             managed.setBearbeitungsStatus(korrektur.getBearbeitungsStatus());
             em.merge(managed);
-            em.getTransaction().commit();
-        } finally {
-            em.close();
         }
-        // Tabelle neu laden
-        alleKorrekturen = null;
+        alleKorrekturen = null; // Tabelle neu laden
     }
 
     // --- Löschen eines Eintrags ---
+    @Transactional
     public void deleteKorrektur(SqlDataKorrekturmgm korrektur) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            em.getTransaction().begin();
-            SqlDataKorrekturmgm managed = em.find(SqlDataKorrekturmgm.class, korrektur.getId());
-            if (managed != null) {
-                em.remove(managed);
-            }
-            em.getTransaction().commit();
-        } finally {
-            em.close();
+        SqlDataKorrekturmgm managed = em.find(SqlDataKorrekturmgm.class, korrektur.getId());
+        if (managed != null) {
+            em.remove(managed);
         }
-        // Tabelle neu laden
-        alleKorrekturen = null;
+        alleKorrekturen = null; // Tabelle neu laden
     }
 
     // --- Virtuelle Sortierwerte ---

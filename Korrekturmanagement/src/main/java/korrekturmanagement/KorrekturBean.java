@@ -2,7 +2,9 @@ package korrekturmanagement;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
-import jakarta.persistence.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ExternalContext;
 import korrekturmanagement.model.SqlDataKorrekturmgm;
@@ -19,7 +21,9 @@ public class KorrekturBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("KorrekturMgrPU");
+    // --- JTA EntityManager---
+    @PersistenceContext(unitName = "KorrekturMgrPU")
+    private EntityManager em;
 
     private SqlDataKorrekturmgm neueKorrektur = new SqlDataKorrekturmgm();
     private UploadedFile datei;
@@ -30,100 +34,73 @@ public class KorrekturBean implements Serializable {
     public UploadedFile getDatei() { return datei; }
     public void setDatei(UploadedFile datei) { this.datei = datei; }
 
-    // --- Alle Korrekturen aus DB ---
+    // --- Alle Korrekturen aus der DB ---
     public List<SqlDataKorrekturmgm> getAlleKorrekturen() {
-        EntityManager em = emf.createEntityManager();
-        try {
-            return em.createQuery("SELECT k FROM SqlDataKorrekturmgm k", SqlDataKorrekturmgm.class)
-                     .getResultList();
-        } finally {
-            em.close();
-        }
+        return em.createQuery("SELECT k FROM SqlDataKorrekturmgm k", SqlDataKorrekturmgm.class)
+                 .getResultList();
     }
 
     // --- Speichern einer neuen Korrektur ---
+    @Transactional
     public String speichern() {
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
         try {
-            tx.begin();
-
             if (datei != null) {
-                String name = datei.getFileName();
-                neueKorrektur.setDateiName(name);
-
-                // Direkt in byte[]
+                neueKorrektur.setDateiName(datei.getFileName());
                 neueKorrektur.setPdfDokument(datei.getContent());
             }
 
             em.persist(neueKorrektur);
-            tx.commit();
+
+            // Formular zurücksetzen
+            neueKorrektur = new SqlDataKorrekturmgm();
+            datei = null;
+
+            return "index?faces-redirect=true";
         } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
             e.printStackTrace();
-        } finally {
-            em.close();
+            return null; 
         }
-
-        // Formular zurücksetzen
-        neueKorrektur = new SqlDataKorrekturmgm();
-        datei = null;
-
-        return "index?faces-redirect=true";
     }
 
-    // --- Löschen ---
+    // --- Löschen einer Korrektur ---
+    @Transactional
     public void loeschen(Long id) {
-        EntityManager em = emf.createEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        try {
-            tx.begin();
-            SqlDataKorrekturmgm k = em.find(SqlDataKorrekturmgm.class, id);
-            if (k != null) em.remove(k);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            e.printStackTrace();
-        } finally {
-            em.close();
+        SqlDataKorrekturmgm k = em.find(SqlDataKorrekturmgm.class, id);
+        if (k != null) {
+            em.remove(k);
         }
     }
 
-    // --- Download ---
+    // --- Datei herunterladen ---
     public void downloadDatei(Long id) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            SqlDataKorrekturmgm k = em.find(SqlDataKorrekturmgm.class, id);
-            if (k != null && k.getPdfDokument() != null) {
-                FacesContext facesContext = FacesContext.getCurrentInstance();
-                ExternalContext externalContext = facesContext.getExternalContext();
+        SqlDataKorrekturmgm k = em.find(SqlDataKorrekturmgm.class, id);
+        if (k != null && k.getPdfDokument() != null) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            ExternalContext externalContext = facesContext.getExternalContext();
 
-                String originalName = k.getDateiName();
-                if (originalName == null || originalName.isEmpty()) {
-                    originalName = "korrektur_" + id + ".pdf";
-                }
+            String originalName = k.getDateiName();
+            if (originalName == null || originalName.isEmpty()) {
+                originalName = "korrektur_" + id + ".pdf";
+            }
 
-                String contentType = "application/octet-stream";
-                if (k.getPdfDokument().length > 4 && k.getPdfDokument()[0] == 0x25 && k.getPdfDokument()[1] == 0x50) {
-                    contentType = "application/pdf";
-                } else {
-                    contentType = "image/jpeg";
-                }
+            // Content-Type ermitteln
+            String contentType = "application/octet-stream";
+            if (k.getPdfDokument().length > 4 && k.getPdfDokument()[0] == 0x25 && k.getPdfDokument()[1] == 0x50) {
+                contentType = "application/pdf";
+            } else {
+                contentType = "image/jpeg";
+            }
 
+            try (OutputStream out = externalContext.getResponseOutputStream()) {
                 externalContext.setResponseContentType(contentType);
                 externalContext.setResponseHeader("Content-Disposition",
                         "attachment;filename=\"" + originalName + "\"");
-
-                OutputStream out = externalContext.getResponseOutputStream();
                 out.write(k.getPdfDokument());
                 out.flush();
                 facesContext.responseComplete();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            em.close();
         }
     }
 }

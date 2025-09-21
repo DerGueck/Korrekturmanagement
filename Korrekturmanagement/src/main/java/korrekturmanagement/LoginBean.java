@@ -20,16 +20,13 @@ public class LoginBean implements Serializable {
     @Inject
     private LoginService loginService;
 
-    public String login() {
-    	System.out.println("Login-Versuch mit Benutzername: " + username);
-        System.out.println("Eingegebenes Passwort: " + password);
+    public String login() {    	
         
         loggedInUser = loginService.authenticate(username, password);
         if (loggedInUser != null) {
             return "backend.xhtml?faces-redirect=true";
-        } else {
+        } else {        	
         	
-        	System.out.println("Login fehlgeschlagen – Benutzer nicht gefunden oder Passwort falsch.");
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login fehlgeschlagen", "Benutzername oder Passwort ist ungültig"));
             return null;

@@ -1,115 +1,112 @@
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-        http://maven.apache.org/xsd/maven-4.0.0.xsd"
->
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>de.iubh.ProjektSoftwareEngineering </groupId>
-  <artifactId>Korrekturmgmt</artifactId>
-  <version>0.1-SNAPSHOT</version>
-  <packaging>war</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
-    <failOnMissingWebXml>false</failOnMissingWebXml>
-  </properties>
-    
-  <build>
-    <plugins>
-	  <plugin>
-	    <groupId>org.apache.maven.plugins</groupId>
-	    <artifactId>maven-war-plugin</artifactId>
-	    <version>3.3.1</version>
-		</plugin>
-    </plugins>
-  </build>
+    <groupId>de.iubh.ProjektSoftwareEngineering</groupId>
+    <artifactId>Korrekturmgmt</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
 
-  <dependencies>    
-  <!-- Servlet API für Jakarta EE 10 -->
-  <dependency>
-  <groupId>jakarta.servlet</groupId>
-  <artifactId>jakarta.servlet-api</artifactId>
-  <version>6.0.0</version>
-  </dependency>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+    </properties>
 
-  <!-- JSF 4.0 -->
-  <dependency>
-    <groupId>org.glassfish</groupId>
-    <artifactId>jakarta.faces</artifactId>
-    <version>4.0.1</version>
-  </dependency>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
+        </plugins>
+    </build>
 
-  <!-- CDI + Weld -->
-  <dependency>
-  <groupId>jakarta.enterprise</groupId>
-  <artifactId>jakarta.enterprise.cdi-api</artifactId>
-  <version>3.0.0</version> 
-</dependency>
-  
-  <dependency>
-    <groupId>org.jboss.weld.servlet</groupId>
-    <artifactId>weld-servlet-core</artifactId>
-    <version>4.0.2.Final</version>
-  </dependency>
+    <dependencies>
+        <!-- Servlet API für Jakarta EE 10 -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
 
-  <!-- PrimeFaces für JSF 4.x -->
-  <dependency>
-    <groupId>org.primefaces</groupId>
-    <artifactId>primefaces</artifactId>
-    <version>11.0.0</version>
-    <classifier>jakarta</classifier>
-  </dependency>
+        <!-- JSF 4.0 -->
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.faces</artifactId>
+            <version>4.0.1</version>
+        </dependency>
 
-  <!-- Hibernate JPA für Jakarta -->
-  <dependency>
-    <groupId>org.hibernate.orm</groupId>
-    <artifactId>hibernate-core</artifactId>
-    <version>6.4.4.Final</version>
-  </dependency>  
- 
-  <dependency>
-    <groupId>jakarta.persistence</groupId>
-    <artifactId>jakarta.persistence-api</artifactId>
-    <version>3.1.0</version>
-  </dependency>
-  <!--verschlüsselung für passwörter-->
-  <dependency>
-    <groupId>org.mindrot</groupId>
-    <artifactId>jbcrypt</artifactId>
-    <version>0.4</version>
-</dependency>
+        <!-- CDI + Weld -->
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        
 
-		<!-- Mariadb Treiber-->
-		<dependency>
-		<groupId>org.mariadb.jdbc</groupId>
-		<artifactId>mariadb-java-client</artifactId>
-		<version>3.5.3</version>
-		</dependency>
+        <!-- PrimeFaces -->
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>11.0.0</version>
+            <classifier>jakarta</classifier>
+        </dependency>
 
-		<!-- Jakarta inject-->
-		<dependency>
-		<groupId>jakarta.inject</groupId>
-		<artifactId>jakarta.inject-api</artifactId>
-		<version>2.0.1</version>
-		</dependency>
-		
-		
-	  <dependency>
-	    <groupId>org.apache.logging.log4j</groupId>
-	    <artifactId>log4j-api</artifactId>
-	    <version>2.20.0</version>
-	  </dependency>
-	  
-	  <dependency>
-	    <groupId>org.apache.logging.log4j</groupId>
-	    <artifactId>log4j-core</artifactId>
-	    <version>2.20.0</version>
-	  </dependency>
-	
+        <!-- Hibernate Core für JPA -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>6.4.4.Final</version>
+        </dependency>
 
-  </dependencies>
-  
+        <!-- Jakarta Persistence API -->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Passwortverschlüsselung -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+        <!-- MariaDB JDBC-Treiber als provided (WildFly Modul) -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.5.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Jakarta Inject API -->
+        <dependency>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <version>2.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Log4j -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.20.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.20.0</version>
+        </dependency>
+    </dependencies>
 </project>

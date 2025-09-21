@@ -5,8 +5,8 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.mindrot.jbcrypt.BCrypt;
 import korrekturmanagement.model.User;
 
@@ -17,31 +17,29 @@ public class UserCreationBean {
     private String newUsername;
     private String newPassword;
 
-    private EntityManager em;
+    @PersistenceContext(unitName = "KorrekturMgrPU")
+    private EntityManager em; // Container-managed JTA EntityManager
 
-    public UserCreationBean() {
-    	EntityManagerFactory emf = Persistence.createEntityManagerFactory("KorrekturMgrPU");;
-        em = emf.createEntityManager();
-    }
-
+    @Transactional
     public String createUser() {
         try {
-            em.getTransaction().begin();
-
             String hashed = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+
             User user = new User();
             user.setUsername(newUsername);
             user.setPasswordHash(hashed);
 
-            em.persist(user);
-            em.getTransaction().commit();
+            em.persist(user); // keine manuelle Transaktion nötig
 
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Testnutzer angelegt", "Benutzer '" + newUsername + "' wurde gespeichert."));
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Testnutzer angelegt",
+                    "Benutzer '" + newUsername + "' wurde gespeichert."));
         } catch (Exception e) {
-            em.getTransaction().rollback();
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Fehler beim Speichern", e.getMessage()));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Fehler beim Speichern",
+                    e.getMessage()));
         }
         return null;
     }
